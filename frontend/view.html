@@ -18,11 +18,12 @@
       align-items: center;
       justify-content: center;
       height: 100vh;
+      padding: 20px;
     }
 
     .container {
-      width: 90%;
-      max-width: 600px;
+      width: 100%;
+      max-width: 700px;
       background: white;
       padding: 30px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.08);
@@ -50,6 +51,23 @@
       padding: 15px;
       border-radius: 8px;
       min-height: 100px;
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background: #4b2e83;
+      color: white;
+      padding: 10px 16px;
+      font-size: 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #3d256c;
     }
   </style>
 </head>
@@ -58,9 +76,12 @@
     <div class="icon">📄</div>
     <h2>Secure Paste</h2>
     <div id="output">Loading...</div>
+    <button onclick="copyToClipboard()">📋 Copy to Clipboard</button>
   </div>
 
   <script>
+    let decryptedContent = "";
+
     async function viewPaste() {
       const params = new URLSearchParams(window.location.search);
       const id = params.get('id');
@@ -80,13 +101,27 @@
         const decrypted = CryptoJS.AES.decrypt(data, fullKey).toString(CryptoJS.enc.Utf8);
 
         if (decrypted) {
-          document.getElementById("output").innerText = decrypted;
+          decryptedContent = decrypted;
+          document.getElementById("output").innerText = decryptedContent;
         } else {
           document.getElementById("output").innerHTML = "<b>❌ Invalid password or corrupted data.</b>";
         }
       } catch (err) {
         document.getElementById("output").innerText = "⚠️ An error occurred while loading the paste.";
       }
+    }
+
+    function copyToClipboard() {
+      if (!decryptedContent) {
+        alert("Nothing to copy.");
+        return;
+      }
+
+      navigator.clipboard.writeText(decryptedContent).then(() => {
+        alert("✅ Copied to clipboard!");
+      }).catch(() => {
+        alert("❌ Failed to copy.");
+      });
     }
 
     viewPaste();
