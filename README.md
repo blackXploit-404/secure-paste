@@ -44,7 +44,7 @@ Completely anonymous by design
 Use it from the browser, or integrate with your apps via simple HTTP requests.
 
 🔗 Try it Out
-👉 https://securepaste.onrender.com
+👉 https://secure-paste.onrender.com
 Live demo — no signup required.
 
 ⚡ Tech Stack
