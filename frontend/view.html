@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SecurePaste - View</title>
+  <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #f9f9f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 600px;
+      background: white;
+      padding: 30px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .icon {
+      font-size: 40px;
+      color: #4b2e83;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      color: #4b2e83;
+      margin-bottom: 20px;
+    }
+
+    #output {
+      font-size: 16px;
+      white-space: pre-wrap;
+      color: #333;
+      border: 1px solid #ccc;
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 8px;
+      min-height: 100px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">📄</div>
+    <h2>Secure Paste</h2>
+    <div id="output">Loading...</div>
+  </div>
+
+  <script>
+    async function viewPaste() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      const key = window.location.hash.slice(1);
+
+      const password = prompt("Enter password if required") || "";
+      const fullKey = key + password;
+
+      try {
+        const res = await fetch(`/paste/${id}`);
+        if (!res.ok) {
+          document.getElementById("output").innerText = "⚠️ Paste not found or expired.";
+          return;
+        }
+
+        const { data } = await res.json();
+        const decrypted = CryptoJS.AES.decrypt(data, fullKey).toString(CryptoJS.enc.Utf8);
+
+        if (decrypted) {
+          document.getElementById("output").innerText = decrypted;
+        } else {
+          document.getElementById("output").innerHTML = "<b>❌ Invalid password or corrupted data.</b>";
+        }
+      } catch (err) {
+        document.getElementById("output").innerText = "⚠️ An error occurred while loading the paste.";
+      }
+    }
+
+    viewPaste();
+  </script>
+</body>
+</html>

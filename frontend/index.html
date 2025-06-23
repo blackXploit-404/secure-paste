@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SecurePaste - </title>
+  <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplemde@1.11.2/dist/simplemde.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/simplemde@1.11.2/dist/simplemde.min.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #f9f9f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 700px;
+      background: white;
+      padding: 30px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      border-radius: 12px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #4b2e83;
+      margin-bottom: 20px;
+    }
+
+    label, select, input {
+      display: block;
+      margin-top: 15px;
+      width: 100%;
+      font-size: 14px;
+    }
+
+    select, input[type="password"] {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-top: 5px;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      background: #4b2e83;
+      color: white;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #3d256c;
+    }
+
+    #result {
+      margin-top: 20px;
+      word-wrap: break-word;
+      text-align: center;
+    }
+
+    .icon {
+      text-align: center;
+      font-size: 40px;
+      color: #4b2e83;
+      margin-bottom: 10px;
+    }
+
+    .editor-toolbar {
+      border-radius: 6px 6px 0 0;
+    }
+
+    .CodeMirror, .CodeMirror-scroll {
+      min-height: 200px;
+      border-radius: 0 0 6px 6px;
+    }
+    footer {
+  background-color: #3d256c;
+  color: #f9f9f9;
+  text-align: center;
+  padding: 20px 10px;
+  font-size: 16px;
+  margin-top: 40px;
+  border-top: 3px solid #4b2e83;
+  line-height: 1.6;
+}
+
+footer a {
+  color: #f9f9f9;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+footer a:hover {
+  color: #ffccff;
+}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">🔐</div>
+    <h2>Create a Secure Paste</h2>
+
+    <textarea id="message" placeholder="Write your message using **Markdown**..."></textarea>
+
+    <label for="expiry">Expire After:</label>
+    <select id="expiry">
+      <option value="60">1 Minute</option>
+      <option value="300">5 Minutes</option>
+      <option value="3600">1 Hour</option>
+      <option value="86400">1 Day</option>
+    </select>
+
+    <label for="pass">Password (optional):</label>
+    <input type="password" id="pass" placeholder="Enter password if needed">
+
+    <button onclick="createPaste()">🔗 Generate Secure Link</button>
+
+    <div id="result"></div>
+    <footer>
+  <p>
+    <a href="mailto:hello@surajitsen.me">📧 Contact Us</a> <br>
+    Made with <span style="color: red;">❤️</span> in India<br>
+    ⚙️ Powered by Node.js, Express, and CryptoJS <br>
+    Hosting by Digital Ocean 🦈<br>
+    💡 Inspired by SecureBin, PrivateBin, and community needs
+  </p>
+</footer>
+  </div>
+ 
+  <script>
+    const simplemde = new SimpleMDE({ 
+      element: document.getElementById("message"),
+      spellChecker: false,
+      toolbar: ["bold", "italic", "heading", "|", "quote", "unordered-list", "ordered-list", "|", "preview", "side-by-side", "guide"]
+    });
+
+    async function createPaste() {
+      const text = simplemde.value();
+      const expirySeconds = parseInt(document.getElementById("expiry").value);
+      const password = document.getElementById("pass").value;
+
+      const key = CryptoJS.lib.WordArray.random(16).toString();
+      const encrypted = CryptoJS.AES.encrypt(text, key + password).toString();
+
+      const res = await fetch('/paste', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: encrypted, expiry: expirySeconds })
+      });
+
+      const { id } = await res.json();
+      const fullLink = `${location.origin}/view.html?id=${id}#${key}`;
+      document.getElementById("result").innerHTML = `
+        <strong>Your secure link:</strong><br>
+        <a href="${fullLink}" target="_blank">${fullLink}</a><br><br>`;
+
+      QRCode.toCanvas(document.createElement('canvas'), fullLink, function (err, canvas) {
+        if (!err) document.getElementById("result").appendChild(canvas);
+      });
+    }
+  </script>
+</body>
+</html>
