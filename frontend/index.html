@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <title>SecurePaste</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplemde@1.11.2/dist/simplemde.min.css">
   <script src="https://cdn.jsdelivr.net/npm/simplemde@1.11.2/dist/simplemde.min.js"></script>
-
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
@@ -21,17 +22,19 @@
       font-family: 'Inter', system-ui, sans-serif;
       background: #f9f9f9;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      height: 100vh;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 20px;
     }
 
     .container {
-      width: 90%;
-      max-width: 700px;
+      width: 100%;
+      max-width: 720px;
       background: white;
-      padding: 30px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      padding: 24px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
       border-radius: 12px;
     }
 
@@ -39,13 +42,14 @@
       text-align: center;
       color: #4b2e83;
       margin-bottom: 20px;
+      font-size: 24px;
     }
 
     label, select, input {
       display: block;
       margin-top: 15px;
       width: 100%;
-      font-size: 14px;
+      font-size: 15px;
     }
 
     select, input[type="password"] {
@@ -93,29 +97,50 @@
       min-height: 200px;
       border-radius: 0 0 6px 6px;
     }
+
     footer {
-  background-color: #3d256c;
-  color: #f9f9f9;
-  text-align: center;
-  padding: 20px 10px;
-  font-size: 16px;
-  margin-top: 40px;
-  border-top: 3px solid #4b2e83;
-  line-height: 1.6;
-}
+      margin-top: 40px;
+      background-color: #3d256c;
+      color: #f9f9f9;
+      text-align: center;
+      padding: 20px 10px;
+      font-size: 15px;
+      border-top: 3px solid #4b2e83;
+      line-height: 1.6;
+      border-radius: 8px;
+    }
 
-footer a {
-  color: #f9f9f9;
-  text-decoration: underline;
-  font-weight: 500;
-}
+    footer a {
+      color: #f9f9f9;
+      text-decoration: underline;
+      font-weight: 500;
+    }
 
-footer a:hover {
-  color: #ffccff;
-}
+    footer a:hover {
+      color: #ffccff;
+    }
 
+    @media (max-width: 500px) {
+      .container {
+        padding: 16px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      button {
+        font-size: 15px;
+      }
+
+      footer {
+        font-size: 14px;
+        padding: 16px 8px;
+      }
+    }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="icon">🔐</div>
@@ -137,19 +162,20 @@ footer a:hover {
     <button onclick="createPaste()">🔗 Generate Secure Link</button>
 
     <div id="result"></div>
-    <footer>
-  <p>
-    <a href="mailto:hello@surajitsen.me">📧 Contact Us</a> <br>
-    Made with <span style="color: red;">❤️</span> in India<br>
-    ⚙️ Powered by Node.js, Express, and CryptoJS <br>
-    Hosting by Render <br>
-    💡 Inspired by SecureBin, PrivateBin, and community needs
-  </p>
-</footer>
   </div>
- 
+
+  <footer>
+    <p>
+      <a href="mailto:hello@surajitsen.me">📧 Contact Us</a> <br>
+      Made with <span style="color: red;">❤️</span> in India<br>
+      ⚙️ Powered by Node.js, Express, and CryptoJS <br>
+      ☁️ Hosting by Render <br>
+      💡 Inspired by SecureBin, PrivateBin, and community needs
+    </p>
+  </footer>
+
   <script>
-    const simplemde = new SimpleMDE({ 
+    const simplemde = new SimpleMDE({
       element: document.getElementById("message"),
       spellChecker: false,
       toolbar: ["bold", "italic", "heading", "|", "quote", "unordered-list", "ordered-list", "|", "preview", "side-by-side", "guide"]
